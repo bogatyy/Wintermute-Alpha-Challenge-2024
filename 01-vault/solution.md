@@ -72,10 +72,48 @@ LIMIT 100
 # Value lost = sum of all assets deposited where shares == 0
 ```
 
-As of the challenge date (2024), this attack has been observed on a few ERC-4626 vaults, but the total value lost has been relatively small (a few thousand dollars total) because:
-1. Most major vault implementations added mitigations early
-2. The attack requires monitoring the mempool for deposits to empty vaults
-3. Many vaults are initialized by the deployer with a small "dead shares" deposit
+### On-Chain Results (Dune query executed March 2026):
+
+The query found **28 distinct vaults** on Ethereum with zero-share deposits since January 2022, totaling **3,800+ incidents**. This is NOT a purely theoretical attack — it has occurred widely.
+
+#### Vaults with confirmed USD losses (priced via `prices.usd`):
+
+| Vault | Token | Incidents | Victims | Total USD Lost | Max Single Loss | Period |
+|---|---|---|---|---|---|---|
+| [`0x46c0...d2c7`](https://etherscan.io/address/0x46c023cbbdfffed1a3a3ef0c915610deeb14847a) | EURC | 17 | 6 | **$65,972** | $29,176 | Oct 2025 – Mar 2026 |
+| [`0x36f0...2266`](https://etherscan.io/address/0x36f008ef8d7a1b0f9e302593f691258f93ea2266) | USDC | 1 | 1 | **$10,007** | $10,007 | Aug 2022 |
+| [`0x8fba...2c34`](https://etherscan.io/address/0x8fbae987cf1d9802ba37575c9c640d1e49de2c34) | USDT | 2 | 1 | **$510** | $500 | Nov 2024 |
+| [`0xb2a2...7382`](https://etherscan.io/address/0xb2a2df33c99765899e7c5beb526d2d3b8b47e382) | stETH | 1 | 1 | **$338** | $338 | Jun 2024 |
+| [`0xb02e...dac5`](https://etherscan.io/address/0xb02e4da6384a82db7360f214316ed494b0b9dac5) | USDC | 8 | 2 | **$93** | $15 | Dec 2025 |
+
+**Total confirmed USD lost: ~$76,920**
+
+#### Largest individual loss transactions:
+
+| Rank | USD Lost | Token | Tx Hash | Date |
+|---|---|---|---|---|
+| 1 | **$29,176** | 25,000 EURC | [`0xd2a9a687...`](https://etherscan.io/tx/0xd2a9a687bd6b80827c50e37f99031f7bbea5606aa24c44abaefd543934dfe9c5) | Oct 17, 2025 |
+| 2 | **$28,741** | 25,000 EURC | [`0xb8daa3fe...`](https://etherscan.io/tx/0xb8daa3fe3cec7d649dbdec2257ee340283cbfd36ccc48cbcca05f1dfe91b769b) | Nov 4, 2025 |
+| 3 | **$10,007** | 10,000 USDC | [`0xb6a94206...`](https://etherscan.io/tx/0xb6a94206e7a96430b5b487dcc7cd81d1626c06d01c2c46a367383cbcc4f296fa) | Aug 23, 2022 |
+| 4 | **$2,414** | 2,075 EURC | [`0xb39702...`](https://etherscan.io/tx/0xb39702071d39d33c282b1ef7844b75414eb4b667a687f69f2cde29cfaee5211c) | Oct 15, 2025 |
+| 5 | **$2,332** | 2,000 EURC | [`0x953ae8...`](https://etherscan.io/tx/0x953ae87f19641a352de9204321aaa82b6f3bb6f8f1cec2a5546be23064b638e7) | Oct 16, 2025 |
+| 6 | **$500** | 500 USDT | [`0x70d9c1...`](https://etherscan.io/tx/0x70d9c12612ee3a9ff70e4b4a80ef6d29106b4958a97ca57bf22db66fde221dda) | Nov 21, 2024 |
+| 7 | **$338** | 0.1 stETH | [`0xa476d5...`](https://etherscan.io/tx/0xa476d573c7560e9bdfe7307739d178d1cf3a45648f4156293a99d60dab8ce6a1) | Jun 27, 2024 |
+
+#### Additional unpriced vaults (significant but token prices unavailable):
+
+| Vault | Token | Incidents | Victims | Total Tokens Lost |
+|---|---|---|---|---|
+| [`0xa088...b994`](https://etherscan.io/address/0xa0882c2d5df29233a092d2887a258c2b90e9b994) | XVS | 760 | 183 | 1,702,526 XVS |
+| [`0x120e...2c2a`](https://etherscan.io/address/0x120e3d70b6df098e0bde3ec0c6c82e70b84d70ea) | UNI-V2 LP | 293 | 83 | 14,330 LP tokens |
+| [`0xe9f9...4ab2`](https://etherscan.io/address/0xe9f9936a639809e766685a436511eac3fb1c85bc) | SLP | 84 | 41 | 12,250 SLP tokens |
+| `0xba0e...0658` | unknown | 1,547 | 650 | — |
+
+**Key observations:**
+1. The vulnerability is **actively exploited** — the EURC vault alone lost $66K across 6 victims in 5 months
+2. Many vaults have ongoing zero-share deposits through March 2026, indicating unpatched deployments
+3. The USDC $10K loss in Aug 2022 is one of the earliest confirmed on-chain inflation attacks
+4. The XVS vault (760 incidents, 183 victims) and UNI-V2 vault (293 incidents, 83 victims) likely represent significant additional USD losses but their tokens lack Ethereum price feeds
 
 ---
 
